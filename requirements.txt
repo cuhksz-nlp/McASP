@@ -1,0 +1,9 @@
+pytorch = 1.3
+tqdm
+nltk
+pandas
+boto3
+requests
+regex
+seqeval
+psutil
