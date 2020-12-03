@@ -347,7 +347,7 @@ def train(args):
                     else:
                         num_of_no_improvement += 1
                         improved = False
-            # keep
+
             if improved:
                 for flag in ['dev', 'test']:
                     best[flag]['best_wp'] = history[flag]['word_p'][epoch]

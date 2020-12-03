@@ -75,7 +75,7 @@ def pos_evaluate_word_PRF(y_pred, y):
 
     wP = word_cor_num / float(yp_wordnum) if yp_wordnum > 0 else -1
     wR = word_cor_num / float(yt_wordnum) if yt_wordnum > 0 else -1
-    wF = 2 * wP * wR / (wP + wR)
+    wF = 2 * wP * wR / (wP + wR) if wP + wR > 0 else 0
 
     # pP = pos_cor_num / float(yp_wordnum) if yp_wordnum > 0 else -1
     # pR = pos_cor_num / float(yt_wordnum) if yt_wordnum > 0 else -1
