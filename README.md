@@ -28,7 +28,7 @@ Our code works with the following environment.
 
 Use `pip install -r requirements.txt` to install the required packages.
 
-## Downloading BERT, ZEN and WMSeg
+## Downloading BERT, ZEN and McASP
 
 In our paper, we use BERT ([paper](https://www.aclweb.org/anthology/N19-1423/)) and ZEN ([paper](https://arxiv.org/abs/1911.00720)) as the encoder.
 
