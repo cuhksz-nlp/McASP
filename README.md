@@ -36,7 +36,7 @@ For BERT, please download pre-trained BERT-Base Chinese from [Google](https://gi
 
 For ZEN, you can download the pre-trained model from [here](https://github.com/sinovation/ZEN).
 
-For McASP, you can download the models we trained in our experiments from here (coming soon).
+For McASP, you can download the models we trained in our experiments from [here](https://pan.baidu.com/s/1aRxpvQEntEle_yIizhvUqQ) (passcode: d3V9).
 
 ## Run on Sample Data
 
@@ -72,9 +72,6 @@ Here are some important parameters:
 
 ## To-do List
 
-* Release pre-trained models
 * Regular maintenance.
 
 You can leave comments in the `Issues` section, if you want us to implement any functions.
-
-
