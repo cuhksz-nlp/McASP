@@ -13,7 +13,7 @@ import pytorch_pretrained_zen as zen
 
 from pytorch_pretrained_bert.crf import CRF
 
-from mctag_helper import load_json, save_json, read_tsv
+from mcasp_helper import load_json, save_json, read_tsv
 
 DEFAULT_HPARA = {
     'max_seq_length': 128,
@@ -84,7 +84,7 @@ class MultiChannelAttention(nn.Module):
         return character_attention
 
 
-class MCTag(nn.Module):
+class McASP(nn.Module):
 
     def __init__(self, word2id, gram2id, gram2count, labelmap, hpara, model_path):
         super().__init__()

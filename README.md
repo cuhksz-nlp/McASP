@@ -52,7 +52,7 @@ All processed data will appear in `data` directory organized by the datasets, wh
 
 ## Training and Testing
 
-You can find the command lines to train and test models on a specific dataset in `run.sh`.
+You can find the command lines to train and test models in `run.sh` and `test.sh`, respectively.
 
 Here are some important parameters:
 

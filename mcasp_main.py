@@ -14,9 +14,9 @@ from pytorch_pretrained_bert.optimization import BertAdam, WarmupLinearSchedule
 
 from tqdm import tqdm, trange
 from seqeval.metrics import classification_report
-from mctag_helper import get_word2id, get_gram2id, get_labels
-from mctag_eval import eval_sentence, pos_evaluate_word_PRF, pos_evaluate_OOV
-from mctag_model import MCTag
+from mcasp_helper import get_word2id, get_gram2id, get_labels
+from mcasp_eval import eval_sentence, pos_evaluate_word_PRF, pos_evaluate_OOV
+from mcasp_model import McASP
 import datetime
 
 
@@ -112,8 +112,8 @@ def train(args):
     label_list = get_labels(args.train_data_path)
     label_map = {label: i for i, label in enumerate(label_list, 0)}
 
-    hpara = MCTag.init_hyper_parameters(args)
-    tagger = MCTag(word2id, gram2id, gram2count, label_map, hpara, model_path=args.bert_model)
+    hpara = McASP.init_hyper_parameters(args)
+    tagger = McASP(word2id, gram2id, gram2count, label_map, hpara, model_path=args.bert_model)
 
     train_examples = tagger.load_tsv_data(args.train_data_path)
     dev_examples = tagger.load_tsv_data(args.dev_data_path)
@@ -410,7 +410,7 @@ def test(args):
     print("device: {} n_gpu: {}, distributed training: {}, 16-bits training: {}".format(
         device, n_gpu, bool(args.local_rank != -1), args.fp16))
 
-    tagger = MCTag.load_model(args.eval_model)
+    tagger = McASP.load_model(args.eval_model)
 
     word2id = tagger.word2id
     eval_examples = tagger.load_tsv_data(args.test_data_path)
