@@ -13,3 +13,5 @@ python mcasp_main.py --do_train --train_data_path=./sample_data/train.tsv --dev_
 
 python mcasp_main.py --do_test --test_data_path=./sample_data/test.tsv --eval_model=./models/test_bert/model
 
+# predict
+python mcasp_main.py --do_predict --test_data_path=./sample_data/sentence.txt --output_file=./output.txt --eval_model=./models/test_bert/model

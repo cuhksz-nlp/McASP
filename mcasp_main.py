@@ -497,6 +497,84 @@ def test(args):
 
 
 def predict(args):
+
+    if args.local_rank == -1 or args.no_cuda:
+        device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
+        n_gpu = torch.cuda.device_count()
+    else:
+        torch.cuda.set_device(args.local_rank)
+        device = torch.device("cuda", args.local_rank)
+        n_gpu = 1
+        # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
+        torch.distributed.init_process_group(backend='nccl')
+    print("device: {} n_gpu: {}, distributed training: {}, 16-bits training: {}".format(
+        device, n_gpu, bool(args.local_rank != -1), args.fp16))
+
+    tagger = McASP.load_model(args.eval_model)
+
+    word2id = tagger.word2id
+    eval_examples = tagger.load_sentence(args.test_data_path)
+
+    num_labels = tagger.num_labels
+    convert_examples_to_features = tagger.convert_examples_to_features
+    feature2input = tagger.feature2input
+    label_map = {i: label for label, i in tagger.labelmap.items()}
+
+    if args.fp16:
+        tagger.half()
+    tagger.to(device)
+    if args.local_rank != -1:
+        try:
+            from apex.parallel import DistributedDataParallel as DDP
+        except ImportError:
+            raise ImportError(
+                "Please install apex from https://www.github.com/nvidia/apex to use distributed and fp16 training.")
+
+        tagger = DDP(tagger)
+    elif n_gpu > 1:
+        tagger = torch.nn.DataParallel(tagger)
+
+    tagger.to(device)
+
+    tagger.eval()
+
+    y_pred = []
+
+    for start_index in tqdm(range(0, len(eval_examples), args.eval_batch_size)):
+        eval_batch_examples = eval_examples[start_index: min(start_index + args.eval_batch_size,
+                                                             len(eval_examples))]
+        eval_features = convert_examples_to_features(eval_batch_examples)
+
+        channel_ids, input_ids, input_mask, l_mask, label_ids, matching_matrix, ngram_ids, ngram_positions, \
+        segment_ids, valid_ids, word_ids, word_mask = feature2input(device, eval_features)
+
+        with torch.no_grad():
+            tag_seq = tagger(input_ids, segment_ids, input_mask, labels=None,
+                             valid_ids=valid_ids, attention_mask_label=l_mask,
+                             word_seq=word_ids, label_value_matrix=matching_matrix,
+                             word_mask=word_mask, channel_ids=channel_ids,
+                             input_ngram_ids=ngram_ids, ngram_position_matrix=ngram_positions)
+
+        logits = tag_seq.to('cpu').numpy()
+        label_ids = label_ids.to('cpu').numpy()
+
+        for i, label in enumerate(label_ids):
+            temp = []
+            for j, m in enumerate(label):
+                if j == 0:
+                    continue
+                elif label_ids[i][j] == num_labels - 1:
+                    y_pred.append(temp)
+                    break
+                else:
+                    temp.append(label_map[logits[i][j]])
+
+    print('write results to %s' % str(args.output_file))
+    with open(args.output_file, 'w', encoding='utf8') as writer:
+        for i in range(len(y_pred)):
+            sentence = eval_examples[i].text_a
+            _, seg_pred_str = eval_sentence(y_pred[i], y_pred[i], sentence, word2id)
+            writer.write('%s\n' % seg_pred_str)
     return
 
 

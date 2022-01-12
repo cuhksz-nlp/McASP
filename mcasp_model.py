@@ -184,7 +184,9 @@ class McASP(nn.Module):
 
         gram2id_path = os.path.join(model_path, 'gram2id.json')
         gram2id = load_json(gram2id_path) if os.path.exists(gram2id_path) else None
-        gram2id = {tuple(k.split('`')): v for k, v in gram2id.items()}
+
+        if gram2id is not None:
+            gram2id = {tuple(k.split('`')): v for k, v in gram2id.items()}
 
         word2id_path = os.path.join(model_path, 'word2id.json')
         word2id = load_json(word2id_path) if os.path.exists(word2id_path) else None
@@ -241,6 +243,67 @@ class McASP(nn.Module):
                 ngram_path = os.path.join(vocab_dir, ngram_name)
                 command = 'cp ' + str(ngram_path) + ' ' + str(os.path.join(output_dir, ngram_name))
                 subprocess.run(command, shell=True)
+
+    def load_sentence(self, data_path):
+
+        flag = 'pred'
+        sentence_list = []
+        label_list = []
+        with open(data_path, 'r', encoding='utf8') as f:
+            lines = f.readlines()
+        for line in lines:
+            line = line.strip()
+            if line == '':
+                continue
+            sent = [c for c in line]
+            label = ['S-NN' for _ in line]
+            sentence_list.append(sent)
+            label_list.append(label)
+
+        data = []
+        for sentence, label in zip(sentence_list, label_list):
+            if self.multi_attention is not None:
+                ngram_list = []
+                matching_position = []
+                ngram_list_len = []
+                for i in range(self.cat_num):
+                    ngram_list.append([])
+                    matching_position.append([])
+                    ngram_list_len.append(0)
+                for i in range(len(sentence)):
+                    for j in range(0, self.ngram_length):
+                        if i + j + 1 > len(sentence):
+                            break
+                        ngram = ''.join(sentence[i: i + j + 1])
+                        if ngram in self.gram2id:
+                            channel_index = self._ngram_category(ngram)
+                            try:
+                                index = ngram_list[channel_index].index(ngram)
+                            except ValueError:
+                                ngram_list[channel_index].append(ngram)
+                                index = len(ngram_list[channel_index]) - 1
+                                ngram_list_len[channel_index] += 1
+                            for k in range(j + 1):
+                                matching_position[channel_index].append((i + k, index))
+            else:
+                ngram_list = None
+                matching_position = None
+                ngram_list_len = None
+            max_ngram_len = max(ngram_list_len) if ngram_list_len is not None else None
+            data.append((sentence, label, ngram_list, matching_position, max_ngram_len))
+
+        examples = []
+        for i, (sentence, label, word_list, matching_position, word_list_len) in enumerate(data):
+            guid = "%s-%s" % (flag, i)
+            text_a = ' '.join(sentence)
+            text_b = None
+            word = word_list
+            label = label
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label, word=word, matrix=matching_position,
+                             sent_len=len(sentence), word_list_len=word_list_len))
+        return examples
+
 
     def load_tsv_data(self, data_path):
 

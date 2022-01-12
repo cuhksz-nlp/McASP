@@ -81,9 +81,9 @@ def pos_evaluate_word_PRF(y_pred, y):
     # pR = pos_cor_num / float(yt_wordnum) if yt_wordnum > 0 else -1
     # pF = 2 * pP * pR / (pP + pR)
 
-    pP = precision_score(y, y_pred)
-    pR = recall_score(y, y_pred)
-    pF = f1_score(y, y_pred)
+    pP = precision_score([y], [y_pred])
+    pR = recall_score([y], [y_pred])
+    pF = f1_score([y], [y_pred])
 
     return (100 * wP, 100 * wR, 100 * wF), (100 * pP, 100 * pR, 100 * pF)
 
