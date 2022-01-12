@@ -197,7 +197,11 @@ class McASP(nn.Module):
         res = cls(model_path=model_path, labelmap=label_map, hpara=hpara,
                   gram2id=gram2id, word2id=word2id, gram2count=gram2count)
 
-        res.load_state_dict(torch.load(os.path.join(model_path, 'pytorch_model.bin')))
+        if torch.cuda.is_available():
+            res.load_state_dict(torch.load(os.path.join(model_path, 'pytorch_model.bin')))
+        else:
+            res.load_state_dict(torch.load(os.path.join(model_path, 'pytorch_model.bin'),
+                                           map_location=torch.device('cpu')))
         return res
 
     def save_model(self, output_dir, vocab_dir):
