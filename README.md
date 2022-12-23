@@ -2,7 +2,14 @@
 
 This is the implementation of [Joint Chinese Word Segmentation and Part-of-speech Tagging via Multi-channel Attention of Character N-grams](https://www.aclweb.org/anthology/2020.coling-main.187/) at COLING 2020.
 
-You can e-mail Yuanhe Tian at `yhtian@uw.edu` or Guimin Chen at `cuhksz.nlp@gmail.com`, if you have any questions.
+You can e-mail Yuanhe Tian at `yhtian@uw.edu`, if you have any questions.
+
+
+**Visit our [homepage](https://github.com/synlp/.github) to find more our recent research and softwares for NLP (e.g., pre-trained LM, POS tagging, NER, sentiment analysis, relation extraction, datasets, etc.).**
+
+## Upgrades of McASP
+
+We are improving our McASP. For updates, please visit [HERE](https://github.com/synlp/McASP).
 
 ## Citation
 
